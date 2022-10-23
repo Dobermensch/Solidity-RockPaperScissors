@@ -35,7 +35,7 @@ describe("RPS contract", function () {
 
     it("Should let first player join the game", async function () {
       const res = await rpsContract.connect(owner).join({value: ethers.utils.parseEther("0.1")});
-      const ownerAddress = await owner.getAddress();
+      const ownerAddress = owner.address;
 
       await expect(res)
       .to.emit(rpsContract, "PlayerJoined")
@@ -54,7 +54,7 @@ describe("RPS contract", function () {
 
     it("Should let second player join the game with valid bet", async function () {
       const res = await rpsContract.connect(addr1).join({value: ethers.utils.parseEther("0.1")});
-      const secondAddress = await addr1.getAddress();
+      const secondAddress = addr1.address;
 
       await expect(res)
       .to.emit(rpsContract, "PlayerJoined")
@@ -66,8 +66,8 @@ describe("RPS contract", function () {
     it("Should not let any more people join the game", async function () {
       await rpsContract.connect(addr2).join({value: ethers.utils.parseEther("0.1")});
 
-      expect(await rpsContract.playerOne()).to.not.eq(addr2.getAddress());
-      expect(await rpsContract.playerTwo()).to.not.eq(addr2.getAddress());
+      expect(await rpsContract.playerOne()).to.not.eq(addr2.address);
+      expect(await rpsContract.playerTwo()).to.not.eq(addr2.address);
     });
   });
 
@@ -98,7 +98,7 @@ describe("RPS contract", function () {
         rpsContract.connect(owner).playGame(hashedInputRock)
       )
       .to.emit(rpsContract, "PlayerMadeMove")
-      .withArgs(await owner.getAddress());
+      .withArgs(owner.address);
 
       expect(await rpsContract.hashedPlayerOneMove()).to.eq(hashedInputRock);
     });
@@ -114,7 +114,7 @@ describe("RPS contract", function () {
         rpsContract.connect(addr1).playGame(hashedInputPaper)
       )
       .to.emit(rpsContract, "PlayerMadeMove")
-      .withArgs(await addr1.getAddress());
+      .withArgs(addr1.address);
 
       expect(await rpsContract.hashedPlayerTwoMove()).to.eq(hashedInputPaper);
     });
@@ -174,7 +174,7 @@ describe("RPS contract", function () {
         playerTwoReveal
       ).to.emit(rpsContract, "GameOver")
 
-      expect(ownerBalanceDiff).to.be.greaterThanOrEqual(200000000000000000);
+      expect(ownerBalanceDiff).to.be.greaterThanOrEqual(199999999990000000);
 
       expect(await rpsContract.playerOneMove()).to.eq(0);
       expect(await rpsContract.playerTwoMove()).to.eq(0);
@@ -184,14 +184,22 @@ describe("RPS contract", function () {
       expect(receipt.events[0].args[0][0]).to.eq("0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"); // playerOne
       expect(receipt.events[0].args[0][1]).to.eq("0x70997970C51812dc3A010C7d01b50e0d17dc79C8"); // playerTwo
       expect(receipt.events[0].args[0][2]).to.eq(1); // outcome -> player 1 won
+    });
 
-      // testing resetGame
+    it("Should reset the game after both players have revealed their choices", async function() {
       expect(await rpsContract.playerOne()).to.eq("0x0000000000000000000000000000000000000000");
       expect(await rpsContract.playerTwo()).to.eq("0x0000000000000000000000000000000000000000");
       expect(await rpsContract.playerOneMove()).to.eq(0);
       expect(await rpsContract.playerTwoMove()).to.eq(0);
       expect(await rpsContract.hashedPlayerOneMove()).to.eq("0x0000000000000000000000000000000000000000000000000000000000000000");
       expect(await rpsContract.hashedPlayerTwoMove()).to.eq("0x0000000000000000000000000000000000000000000000000000000000000000");
+    });
+
+    it("Should save the game result in the gamesPlayedResults array", async function() {
+      const result = await rpsContract.getHistoricalGameAtIndex(0);
+      expect(result[0]).to.eq(owner.address);
+      expect(result[1]).to.eq(addr1.address);
+      expect(result[2]).to.eq(1);
     });
 
     it ("should give both the users their money back when there is a draw game", async function() {
