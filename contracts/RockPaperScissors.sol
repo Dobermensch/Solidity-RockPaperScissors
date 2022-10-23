@@ -167,4 +167,16 @@ contract RockPaperScissors is ReentrancyGuard {
         hashedPlayerOneMove = "";
         hashedPlayerTwoMove = "";
     }
+
+    function getHistoricalGameAtIndex(uint256 index)
+        public
+        view
+        returns (GameResult memory)
+    {
+        require(
+            index >= 0 && index < gamesPlayedResults.length,
+            "Please enter a valid index"
+        );
+        return gamesPlayedResults[index];
+    }
 }
