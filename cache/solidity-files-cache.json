@@ -2,8 +2,8 @@
   "_format": "hh-sol-cache-2",
   "files": {
     "/Users/rain/personal/rps/contracts/RockPaperScissors.sol": {
-      "lastModificationDate": 1666425537941,
-      "contentHash": "6bca756cf2cf71fc19efc8c60abec5f8",
+      "lastModificationDate": 1666522860024,
+      "contentHash": "110f96c0da6132e6229189103d99060a",
       "sourceName": "contracts/RockPaperScissors.sol",
       "solcConfig": {
         "version": "0.8.17",
@@ -30,8 +30,7 @@
       },
       "imports": [
         "@openzeppelin/contracts/utils/math/SafeMath.sol",
-        "@openzeppelin/contracts/security/ReentrancyGuard.sol",
-        "hardhat/console.sol"
+        "@openzeppelin/contracts/security/ReentrancyGuard.sol"
       ],
       "versionPragmas": [
         "^0.8.0"
@@ -146,8 +145,8 @@
       ]
     },
     "/Users/rain/personal/rps/contracts/GetHashedValue.sol": {
-      "lastModificationDate": 1666419165686,
-      "contentHash": "c09f9afbbf23cd8505a12c8b0d189c9e",
+      "lastModificationDate": 1666429534312,
+      "contentHash": "c62a4d4c72d9fcd32b7e1cd2b3515c4b",
       "sourceName": "contracts/GetHashedValue.sol",
       "solcConfig": {
         "version": "0.8.17",
