@@ -200,6 +200,10 @@ describe("RPS contract", function () {
       expect(result[0]).to.eq(owner.address);
       expect(result[1]).to.eq(addr1.address);
       expect(result[2]).to.eq(1);
+
+      await expect(
+        rpsContract.getHistoricalGameAtIndex(1)
+      ).to.be.revertedWith('Please enter a valid index');
     });
 
     it ("should give both the users their money back when there is a draw game", async function() {

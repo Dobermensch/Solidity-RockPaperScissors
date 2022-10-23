@@ -174,7 +174,7 @@ contract RockPaperScissors is ReentrancyGuard {
         returns (GameResult memory)
     {
         require(
-            index >= 0 && index < gamesPlayedResults.length,
+            index < gamesPlayedResults.length,
             "Please enter a valid index"
         );
         return gamesPlayedResults[index];
