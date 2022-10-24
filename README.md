@@ -8,5 +8,7 @@ A nice little on chain project pvp rock-paper-scissors project complete with tes
 4. `npx hardhat test` to run tests 
 
 ### TODO
-1. Add time based cutoff to end game in case second player never reveals choice
-2. Add game rooms to support multiple players 
+1. Add time based cutoff to end game in case second player never reveals choice - done
+
+### Suggestions for improvement
+1. Add game rooms to support multiple players
