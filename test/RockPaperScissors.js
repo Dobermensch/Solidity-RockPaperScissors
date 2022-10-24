@@ -193,6 +193,7 @@ describe("RPS contract", function () {
       expect(await rpsContract.playerTwoMove()).to.eq(0);
       expect(await rpsContract.hashedPlayerOneMove()).to.eq("0x0000000000000000000000000000000000000000000000000000000000000000");
       expect(await rpsContract.hashedPlayerTwoMove()).to.eq("0x0000000000000000000000000000000000000000000000000000000000000000");
+      expect(await rpsContract.firstReveal()).to.eq(0);
     });
 
     it("Should save the game result in the gamesPlayedResults array", async function() {
@@ -206,28 +207,35 @@ describe("RPS contract", function () {
       ).to.be.revertedWith('Please enter a valid index');
     });
 
-    it ("should give both the users their money back when there is a draw game", async function() {
+    it ("Should penalize the player who hasn't revealed choice in 10 minutes", async function() {
       const { rpsContract, owner, addr1 } = await loadFixture(
         deployContractFixture
       );
 
       const ownerBalance = ethers.utils.formatEther((await provider.getBalance(owner.address)).toString());
-      const addr1Balance = ethers.utils.formatEther((await provider.getBalance(addr1.address)).toString());
 
       await rpsContract.connect(owner).join({value: ethers.utils.parseEther("1")});
       await rpsContract.connect(addr1).join({value: ethers.utils.parseEther("1")});
 
       await rpsContract.connect(owner).playGame(hashedInputPaper);
-      await rpsContract.connect(addr1).playGame(hashedInputPaper);
+      await rpsContract.connect(addr1).playGame(hashedInputRock);
 
       await rpsContract.connect(owner).revealPlayerChoice(2, test2Bytes);
-      await rpsContract.connect(addr1).revealPlayerChoice(2, test2Bytes);
+      // revealed again within max reveal time, nothing happens
+      await rpsContract.connect(owner).revealPlayerChoice(2, test2Bytes);
+
+      expect(await rpsContract.playerOne()).to.eq(owner.address); // game wasn't reset
+
+      await provider.send("evm_increaseTime", [3600]) // an hour later...
+      await provider.send("evm_mine")
+
+      await rpsContract.connect(owner).revealPlayerChoice(2, test2Bytes); // player can retrigger the reveal choice
 
       const ownerBalanceNew = ethers.utils.formatEther((await provider.getBalance(owner.address)).toString());
-      const addr1BalanceNew = ethers.utils.formatEther((await provider.getBalance(addr1.address)).toString());
 
-      expect(Math.ceil(ownerBalance)).to.eq(Math.ceil(ownerBalanceNew));
-      expect(Math.ceil(addr1Balance)).to.eq(Math.ceil(addr1BalanceNew));
+      const ownerBalanceDiff = ownerBalanceNew - ownerBalance;
+
+      expect(parseFloat(ownerBalanceDiff)).to.be.greaterThanOrEqual(0.99); // get both joined players' balance
     });
   });
 });

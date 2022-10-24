@@ -19,6 +19,8 @@ contract RockPaperScissors is ReentrancyGuard {
         GameOutcome outcome;
     }
 
+    uint public constant REVEAL_TIMEOUT = 10 minutes;
+    uint public firstReveal;
     address payable public playerOne;
     address payable public playerTwo;
     bytes32 public hashedPlayerOneMove;
@@ -96,6 +98,30 @@ contract RockPaperScissors is ReentrancyGuard {
             "The game is still running!"
         );
 
+        if (
+            // one player has revealed move but the other hasn't and max time to do so has elapsed
+            (firstReveal != 0 &&
+                block.timestamp > firstReveal + REVEAL_TIMEOUT) &&
+            ((playerOneMove != 0 &&
+                playerTwoMove == 0 &&
+                msg.sender == playerOne) ||
+                (playerTwoMove != 0 &&
+                    playerOneMove == 0 &&
+                    msg.sender == playerTwo))
+        ) {
+            // penalizing players who don't reveal their choice
+            uint256 playerOneBalance = playerBalances[playerOne];
+            playerBalances[playerOne] -= playerOneBalance;
+
+            uint256 playerTwoBalance = playerBalances[playerTwo];
+            playerBalances[playerTwo] -= playerTwoBalance;
+
+            uint256 totalBalance = playerTwoBalance + playerOneBalance;
+            msg.sender.call{value: totalBalance}("");
+
+            resetGame();
+        }
+
         bytes32 hashedAnswer = keccak256(abi.encodePacked(move, password));
 
         if (msg.sender == playerOne && hashedAnswer == hashedPlayerOneMove) {
@@ -104,6 +130,10 @@ contract RockPaperScissors is ReentrancyGuard {
             msg.sender == playerTwo && hashedAnswer == hashedPlayerTwoMove
         ) {
             playerTwoMove = move;
+        }
+
+        if (firstReveal == 0) {
+            firstReveal = block.timestamp;
         }
 
         if (playerOneMove != 0 && playerTwoMove != 0) {
@@ -166,6 +196,7 @@ contract RockPaperScissors is ReentrancyGuard {
         playerTwoMove = 0;
         hashedPlayerOneMove = "";
         hashedPlayerTwoMove = "";
+        firstReveal = 0;
     }
 
     function getHistoricalGameAtIndex(uint256 index)
