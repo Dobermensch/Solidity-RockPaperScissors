@@ -248,7 +248,7 @@ describe("RPS contract", function () {
       // revealed again within max reveal time, nothing happens
       await rpsContract.connect(owner).revealPlayerChoice(2, test2Bytes);
 
-      expect(await rpsContract.playerOne()).to.eq(owner.address); // game wasn't reset
+      expect(await rpsContract.playerOneMove()).to.eq(2); // game wasn't reset
 
       await provider.send("evm_increaseTime", [3600]) // an hour later...
       await provider.send("evm_mine")
@@ -260,6 +260,7 @@ describe("RPS contract", function () {
       const ownerBalanceDiff = ownerBalanceNew - ownerBalance;
 
       expect(parseFloat(ownerBalanceDiff)).to.be.greaterThanOrEqual(0.99); // get both joined players' balance
+      expect(await rpsContract.playerOneMove()).to.eq(0); // game was reset
     });
   });
 });

@@ -88,10 +88,7 @@ contract RockPaperScissors is ReentrancyGuard {
         return true;
     }
 
-    function revealPlayerChoice(uint256 move, bytes32 password)
-        public
-        returns (uint256)
-    {
+    function revealPlayerChoice(uint256 move, bytes32 password) public {
         require(
             hashedPlayerOneMove != bytes32(0x0) &&
                 hashedPlayerTwoMove != bytes32(0x0),
@@ -120,6 +117,7 @@ contract RockPaperScissors is ReentrancyGuard {
             msg.sender.call{value: totalBalance}("");
 
             resetGame();
+            return;
         }
 
         bytes32 hashedAnswer = keccak256(abi.encodePacked(move, password));
