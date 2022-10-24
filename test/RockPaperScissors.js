@@ -207,6 +207,30 @@ describe("RPS contract", function () {
       ).to.be.revertedWith('Please enter a valid index');
     });
 
+    it ("should give both the users their money back when there is a draw game", async function() {
+      const { rpsContract, owner, addr1 } = await loadFixture(
+        deployContractFixture
+      );
+
+      const ownerBalance = ethers.utils.formatEther((await provider.getBalance(owner.address)).toString());
+      const addr1Balance = ethers.utils.formatEther((await provider.getBalance(addr1.address)).toString());
+
+      await rpsContract.connect(owner).join({value: ethers.utils.parseEther("1")});
+      await rpsContract.connect(addr1).join({value: ethers.utils.parseEther("1")});
+
+      await rpsContract.connect(owner).playGame(hashedInputPaper);
+      await rpsContract.connect(addr1).playGame(hashedInputPaper);
+
+      await rpsContract.connect(owner).revealPlayerChoice(2, test2Bytes);
+      await rpsContract.connect(addr1).revealPlayerChoice(2, test2Bytes);
+
+      const ownerBalanceNew = ethers.utils.formatEther((await provider.getBalance(owner.address)).toString());
+      const addr1BalanceNew = ethers.utils.formatEther((await provider.getBalance(addr1.address)).toString());
+
+      expect(Math.ceil(ownerBalance)).to.eq(Math.ceil(ownerBalanceNew));
+      expect(Math.ceil(addr1Balance)).to.eq(Math.ceil(addr1BalanceNew));
+    });
+
     it ("Should penalize the player who hasn't revealed choice in 10 minutes", async function() {
       const { rpsContract, owner, addr1 } = await loadFixture(
         deployContractFixture
