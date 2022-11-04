@@ -12,3 +12,6 @@ A nice little on chain project pvp rock-paper-scissors project complete with tes
 
 ### Suggestions for improvement
 1. Add game rooms to support multiple players
+
+# Outcome
+Got good feedback but they went with a guy who asked for less money and was more "passionate" - human biases are a piece of work.
