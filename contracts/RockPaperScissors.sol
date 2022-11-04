@@ -130,7 +130,7 @@ contract RockPaperScissors is ReentrancyGuard {
             playerTwoMove = move;
         }
 
-        if (firstReveal == 0) {
+        if ((playerOneMove != 0 || playerTwoMove != 0) && firstReveal == 0) {
             firstReveal = block.timestamp;
         }
 
