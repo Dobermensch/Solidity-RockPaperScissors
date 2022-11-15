@@ -108,10 +108,10 @@ contract RockPaperScissors is ReentrancyGuard {
         ) {
             // penalizing players who don't reveal their choice
             uint256 playerOneBalance = playerBalances[playerOne];
-            playerBalances[playerOne] -= playerOneBalance;
+            playerBalances[playerOne] = 0;
 
             uint256 playerTwoBalance = playerBalances[playerTwo];
-            playerBalances[playerTwo] -= playerTwoBalance;
+            playerBalances[playerTwo] = 0;
 
             uint256 totalBalance = playerTwoBalance + playerOneBalance;
             msg.sender.call{value: totalBalance}("");
@@ -149,11 +149,11 @@ contract RockPaperScissors is ReentrancyGuard {
 
         if (playerOneMove == playerTwoMove) {
             uint256 playerOneBalance = playerBalances[playerOne];
-            playerBalances[playerOne] -= playerOneBalance;
+            playerBalances[playerOne] = 0;
             playerOne.call{value: playerOneBalance}("");
 
             uint256 playerTwoBalance = playerBalances[playerTwo];
-            playerBalances[playerTwo] -= playerTwoBalance;
+            playerBalances[playerTwo] = 0;
             playerTwo.call{value: playerTwoBalance}("");
         } else if (
             (playerOneMove == 1 && playerTwoMove == 2) ||
@@ -176,10 +176,10 @@ contract RockPaperScissors is ReentrancyGuard {
         gamesPlayedResults.push(result);
 
         uint256 playerTwoBalance = playerBalances[playerTwo];
-        playerBalances[playerTwo] -= playerTwoBalance;
+        playerBalances[playerTwo] = 0;
 
         uint256 playerOneBalance = playerBalances[playerOne];
-        playerBalances[playerOne] -= playerOneBalance;
+        playerBalances[playerOne] = 0;
 
         resetGame();
         uint256 totalBalance = playerTwoBalance + playerOneBalance;
